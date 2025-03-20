@@ -1,0 +1,41 @@
+workspace {
+    model {
+        user = person "Utilizator" "Caută și rezervă terenuri sportive."
+        owner = person "Proprietar de teren" "Adaugă terenuri disponibile pentru închiriere."
+        admin = person "Administrator" "Administrează platforma."
+        
+        sportbnb = softwareSystem "sportBNB" "Platformă de rezervări pentru terenuri sportive."
+
+       payment = softwareSystem "Serviciu de plăți" "Stripe/PayPal" {
+    tags "External System"
+}
+
+        notifications = softwareSystem "Serviciu de notificări" "Email/SMS"{
+            tags "External System"
+        }
+
+        user -> sportbnb "Caută și rezervă terenuri"
+        owner -> sportbnb "Adaugă terenuri pentru închiriere"
+        admin -> sportbnb "Administrează platforma"
+
+        sportbnb -> payment "Procesează plăți"
+        sportbnb -> notifications "Trimite Email folosind [SMTP]"
+        notifications -> user "Trimite Mail"
+        notifications -> owner " Trimite Mail"
+    }
+    views {
+    systemContext sportbnb {
+        include *
+        autolayout lr
+    }
+
+    styles {
+        element "External System" {
+            background "#D3D3D3" 
+            border dashed
+        }
+    }
+
+    theme default
+}
+}
