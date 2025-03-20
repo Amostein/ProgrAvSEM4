@@ -1,0 +1,35 @@
+workspace {
+    model {
+        sportbnb = softwareSystem "sportBNB" "Platformă de rezervări pentru terenuri sportive." {
+            backend = container "API Application" "Gestionează logica aplicației" "Node.js / Express" {
+                signInController = component "SignInController" "Gestionează autentificarea utilizatorilor"
+                securityComponent = component "SecurityComponent" "Gestionarea securității și token-urilor"
+                userService = component "UserService" "Logica de business pentru utilizatori"
+                userRepository = component "UserRepository" "Interfață pentru baza de date"
+            }
+
+            webApp = container "Web Application" "Interfață web pentru utilizatori și proprietari" "React/Next.js"
+            mobileApp = container "Mobile App" "Aplicație mobilă pentru rezervări" "Flutter"
+
+            database = container "Baza de date" "Stochează utilizatori, terenuri și rezervări" "MariaDB"
+        }
+
+ webApp -> UserService "Foloseste"
+  mobileApp -> UserService "Foloseste"
+        webApp -> signInController "Autentificare utilizatori"
+        mobileApp -> signInController "Autentificare utilizatori"
+        signInController -> securityComponent "Verifică datele de autentificare"
+        securityComponent -> database "Stochează și validează credențiale"
+        userService -> userRepository "Interogări în baza de date"
+        userRepository -> database "Scrie si citeste [JDBC]"
+    }
+
+    views {
+        component backend {
+            include *
+            autolayout lr
+        }
+
+        theme default
+    }
+}
