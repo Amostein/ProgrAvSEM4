@@ -1,0 +1,73 @@
+workspace {
+    model {
+        user = person "Utilizator" "Caută și rezervă terenuri sportive."
+        owner = person "Proprietar de teren" "Adaugă terenuri disponibile pentru închiriere."
+        admin = person "Administrator" "Administrează platforma."
+
+        sportbnb = softwareSystem "sportBNB" "Platformă de rezervări pentru terenuri sportive." {
+            webApp = container "Web Application" "Interfață web pentru utilizatori și proprietari" "React/Next.js"
+            mobileApp = container "Mobile App" "Aplicație mobilă pentru rezervări" "Flutter"
+            api = container "API Application" "Expune funcționalitățile printr-un API REST" "Node.js/Express"
+            db = container "Database" "Stochează date despre utilizatori, terenuri, rezervări" "PostgreSQL"
+            bookingService = container "Booking Service" "Gestionarea rezervărilor de terenuri" "Node.js"
+            paymentService = container "Payment Service" "Procesarea plăților" "Node.js"
+            notificationService = container "Notification Service" "Trimite notificări prin Email/SMS" "Node.js"
+        }
+
+        payment = softwareSystem "Serviciu de plăți" "Stripe/PayPal" {
+            tags "External System"
+        }
+        notifications = softwareSystem "Serviciu de notificări" "Email/SMS" {
+            tags "External System"
+        }
+        auth = softwareSystem "Sistem de autentificare" "Google/Facebook/MariaDB" {
+            tags "External System"
+        }
+
+        sportbnb -> payment "Procesează plăți"
+        sportbnb -> notifications "Trimite notificări"
+        sportbnb -> auth "Validare utilizatori"
+        user -> auth "Autentificare"
+        owner -> auth "Autentificare"
+        notifications -> user "Trimite mail/notificari"
+        notifications -> owner "Trimite mail/notificari"
+        
+        #Actori spre sistem
+        user -> WebApp "Foloseste aplicatia"
+        owner -> WebApp "Foloseste aplicatia"
+        admin -> WebApp "Administreaza aplicatia"
+        user -> mobileApp "Foloseste aplicatia"
+        owner -> mobileApp "Foloseste aplicatia"
+        
+        bookingService -> db "Acceseaza"
+        webApp -> api "Interacționează cu"
+        mobileApp -> api "Interacționează cu"
+        api -> db "Citește și scrie date"
+        api -> bookingService "Gestionează rezervările"
+        api -> paymentService "Procesează plăți"
+        api -> notificationService "Trimite notificări"
+
+        # Conexiuni externe
+        paymentService -> payment "Plăți online"
+        notificationService -> notifications "Trimite notificări"
+    }
+
+    views {
+        container sportbnb {
+            include *
+            include user
+            include owner
+            include admin
+            autolayout lr
+        }
+
+        styles {
+            element "External System" {
+                background "#D3D3D3"
+                border dashed
+            }
+        }
+
+        theme default
+    }
+}
